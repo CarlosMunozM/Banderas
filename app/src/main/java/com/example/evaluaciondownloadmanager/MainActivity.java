@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -43,33 +44,11 @@ public class MainActivity extends AppCompatActivity implements Asynchtask, Adapt
         lstOpciones.setOnItemClickListener(this);
     }
 
+    Pais paisMOD;
     Pais[] pais;
 
     @Override
     public void processFinish(String result) throws JSONException {
-
-        /*
-        //JSONArray articulo = new JSONArray(result);
-        JSONObject objArticulos = new JSONObject(result);
-        JSONArray articulo = objArticulos.getJSONArray("BD");
-
-        ArrayList<Pais> listaArticulos;
-        listaArticulos = Pais.JsonObjectsBuild(articulo);
-        AdaptadorPais adaptadorarticulo = new AdaptadorPais(this, listaArticulos);
-
-        ListView lstOpciones = (ListView) findViewById(R.id.lstLista);
-        lstOpciones.setAdapter(adaptadorarticulo);
-        */
-
-
-        //ArrayList<HashMap<String, String>> contactList = new ArrayList<>();
-        //JSONObject jsonObj = new JSONObject(result);
-        //JSONArray contacts = jsonObj.getJSONArray("Results");
-
-        //pais = new Pais[contacts.length()];
-
-
-        //pais[0] = new Pais("hola");
 
 
         ArrayList<Pais> listaArticulo;
@@ -78,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements Asynchtask, Adapt
         ArrayList<Pais> paises = new ArrayList<>();
 
         JSONObject results=articulos.getJSONObject("Results");
-        JSONArray namesBD=results.names();
+        JSONArray namesBD = results.names();
 
         for (int i = 0; i < namesBD.length(); i++) {
 
@@ -86,11 +65,20 @@ public class MainActivity extends AppCompatActivity implements Asynchtask, Adapt
             JSONObject d=results.getJSONObject(a);
             String nombrePais=d.getString("Name");
 
-            JSONObject countryCodes=d.getJSONObject("CountryCodes");
+            JSONObject countryCodes= d.getJSONObject("CountryCodes");
             String iso2=countryCodes.getString("iso2");
 
-            paises.add(new Pais(nombrePais,iso2));
-            //articulos.add(new Articulo(d.getJSONObject(i)));
+
+            JSONObject geoRectangle = d.getJSONObject("GeoRectangle");
+            String west = geoRectangle.getString("West");
+            String east = geoRectangle.getString("East");
+            String north = geoRectangle.getString("North");
+            String south = geoRectangle.getString("South");
+
+
+
+            paises.add(new Pais(nombrePais,iso2, west, east, north, south));
+            //paises.add(new Pais(nombrePais,iso2));
         }
 
 
@@ -122,21 +110,36 @@ public class MainActivity extends AppCompatActivity implements Asynchtask, Adapt
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        DownloadManager.Request request = new DownloadManager.Request(
-                Uri.parse(((Pais) adapterView.getItemAtPosition(position)).getImagen()));
+        //DownloadManager.Request request = new DownloadManager.Request(
+        //Uri.parse(((Pais) adapterView.getItemAtPosition(position)).getImagen()));
 
-        request.setDescription("PDF Paper");
-        request.setTitle("Pdf Article");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            request.allowScanningByMediaScanner();
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        }
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "filedownload.png");
-        DownloadManager manager = (DownloadManager) this.getApplicationContext().getSystemService(Context.DOWNLOAD_SERVICE);
-        try {
-            manager.enqueue(request);
-        } catch (Exception e) {
-            Toast.makeText(this.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        paisMOD = (Pais) (adapterView.getItemAtPosition(position));
+
+
+        Intent intent = new Intent(this, MapaPaises.class);
+        intent.putExtra("oeste", paisMOD.getWest());
+        intent.putExtra("este", paisMOD.getEast());
+        intent.putExtra("norte", paisMOD.getNorth());
+        intent.putExtra("sur", paisMOD.getSouth());
+        intent.putExtra("imagen", paisMOD.getImagen());
+        intent.putExtra("nombre", paisMOD.getNombre());
+        startActivity(intent);
+
+        /*
+        Bundle bundle = new Bundle();
+
+        bundle.putString("oeste", paisMOD.getWest());
+        bundle.putString("este", paisMOD.getEast());
+        bundle.putString("norte", paisMOD.getNorth());
+        bundle.putString("sur", paisMOD.getSouth());
+        bundle.putString("imagen", paisMOD.getImagen());
+
+        Intent intent = new Intent(this, MapaPaises.class);
+        intent.putExtras(bundle);
+        view.getContext().startActivity(intent);
+
+        startActivity(intent);
+        //startActivity(new Intent(this, ));
+        */
     }
 }

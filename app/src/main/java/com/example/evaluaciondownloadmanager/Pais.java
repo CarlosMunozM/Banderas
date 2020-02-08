@@ -8,15 +8,28 @@ import java.util.ArrayList;
 
 public class Pais {
 
-    String nombre, imagen;
+    String nombre, imagen, west, east, north, south;
 
-    public Pais(String name) {
-        nombre = name;
+    public Pais() {
+    }
+
+
+    public Pais(String nombre, String iso2, String west, String east, String north, String south) {
+        this.nombre = nombre;
+        this.imagen =  "http://www.geognos.com/api/en/countries/flag/"  + iso2 + ".png";
+        this.west = west;
+        this.east = east;
+        this.north = north;
+        this.south = south;
     }
 
     public Pais(String name, String iso2) {
         nombre = name;
         imagen =  "http://www.geognos.com/api/en/countries/flag/"  + iso2 + ".png";
+    }
+
+    public Pais(String name) {
+        nombre = name;
     }
 
     public Pais(JSONObject a) throws JSONException {
@@ -49,5 +62,35 @@ public class Pais {
         this.imagen = imagen;
     }
 
+    public String getWest() {
+        return west;
+    }
 
+    public void setWest(String west) {
+        this.west = west;
+    }
+
+    public String getEast() {
+        return east;
+    }
+
+    public void setEast(String east) {
+        this.east = east;
+    }
+
+    public String getNorth() {
+        return north;
+    }
+
+    public void setNorth(String north) {
+        this.north = north;
+    }
+
+    public String getSouth() {
+        return south;
+    }
+
+    public void setSouth(String south) {
+        this.south = south;
+    }
 }
